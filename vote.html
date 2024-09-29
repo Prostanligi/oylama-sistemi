@@ -3,55 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oylama Seçenekleri</title>
+    <title>Oylama Sistemi</title>
 </head>
 <body>
-    <h1>Oylama Seçenekleri</h1>
-    <div>
-        <button id="option1" onclick="vote(1)">Seçenek 1</button>
-        <button id="option2" onclick="vote(2)">Seçenek 2</button>
-        <button id="option3" onclick="vote(3)">Seçenek 3</button>
-    </div>
-    <div id="results" style="display:none;">
-        <h2>Sonuçlar</h2>
-        <p id="result1">Seçenek 1: 0%</p>
-        <p id="result2">Seçenek 2: 0%</p>
-        <p id="result3">Seçenek 3: 0%</p>
+    <h1>Oylama</h1>
+    <div id="user-info">
+        <input type="text" id="name" placeholder="İsim" required>
+        <input type="text" id="surname" placeholder="Soyisim" required>
+        <button onclick="submitUserInfo()">Devam Et</button>
     </div>
 
     <script>
-        let votes = JSON.parse(localStorage.getItem('votes')) || [0, 0, 0];
-        const userKey = localStorage.getItem('userName');
+        function submitUserInfo() {
+            const name = document.getElementById('name').value.trim();
+            const surname = document.getElementById('surname').value.trim();
 
-        function vote(option) {
-            // Kullanıcının daha önce oy kullanıp kullanmadığını kontrol et
-            if (localStorage.getItem(userKey + '_voted')) {
-                alert("Zaten oy kullandınız!");
+            if (name === '' || surname === '') {
+                alert("Lütfen isminizi ve soyisminizi girin.");
                 return;
             }
 
-            // Kullanıcı sadece bir seçenek seçebilir
-            for (let i = 1; i <= 3; i++) {
-                document.getElementById(`option${i}`).disabled = true; // Tüm butonları devre dışı bırak
-            }
+            const userKey = `${name} ${surname}`;
+            localStorage.setItem('userName', userKey);
 
-            votes[option - 1]++;
-            localStorage.setItem('votes', JSON.stringify(votes));
-            localStorage.setItem(userKey + '_voted', 'true'); // Kullanıcının oy kullandığını kaydet
-            displayResults();
+            window.location.href = "vote.html"; // vote.html sayfasına yönlendir
         }
-
-        function displayResults() {
-            const totalVotes = votes.reduce((a, b) => a + b, 0);
-            document.getElementById('results').style.display = 'block';
-
-            for (let i = 0; i < votes.length; i++) {
-                const percentage = totalVotes ? ((votes[i] / totalVotes) * 100).toFixed(2) : 0;
-                document.getElementById(`result${i + 1}`).innerText = `Seçenek ${i + 1}: ${percentage}%`;
-            }
-        }
-
-        window.onload = displayResults;
     </script>
 </body>
 </html>
