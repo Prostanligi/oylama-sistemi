@@ -24,8 +24,8 @@
             }
 
             // Kullanıcı bilgilerini yerel depolamaya kaydet
-            localStorage.setItem('userName', name);
-            localStorage.setItem('userSurname', surname);
+            const userKey = `${name} ${surname}`;
+            localStorage.setItem('userName', userKey);
 
             // İkinci sayfaya yönlendir
             window.location.href = "vote.html"; // vote.html sayfasına yönlendir
