@@ -4,50 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oylama Seçenekleri</title>
+    <style>
+        .bar {
+            height: 30px;
+            background-color: lightblue;
+            margin: 5px 0;
+            transition: width 0.5s;
+        }
+        .bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
     <h1>Oylama Seçenekleri</h1>
     <div>
-        <p><button id="option1" onclick="vote(1)">1. ADY Makoto</button></p>
-        <p><button id="option2" onclick="vote(2)">2. MET Lusyon</button></p>
-        <p><button id="option3" onclick="vote(3)">3. TETA Sezar</button></p>
-    </div>
-    <div id="results" style="display:none;">
-        <h2>Sonuçlar</h2>
-        <p id="result1">1. ADY Makoto: 0%</p>
-        <p id="result2">2. MET Lusyon: 0%</p>
-        <p id="result3">3. TETA Sezar: 0%</p>
+        <button id="option1" onclick="vote(1)">1. ADY Makoto</button>
+        <div class="bar-container">
+            <div id="bar1" class="bar" style="width: 0%;"></div>
+        </div>
+        <button id="option2" onclick="vote(2)">2. MET Lusyon</button>
+        <div class="bar-container">
+            <div id="bar2" class="bar" style="width: 0%;"></div>
+        </div>
+        <button id="option3" onclick="vote(3)">3. TETA Sezar</button>
+        <div class="bar-container">
+            <div id="bar3" class="bar" style="width: 0%;"></div>
+        </div>
     </div>
 
     <script>
         let votes = JSON.parse(localStorage.getItem('votes')) || [0, 0, 0];
-        const userKey = localStorage.getItem('userName');
+        const totalVotes = votes.reduce((a, b) => a + b, 0);
 
         function vote(option) {
             // Kullanıcının daha önce oy kullanıp kullanmadığını kontrol et
+            const userKey = localStorage.getItem('userName');
             if (localStorage.getItem(userKey + '_voted')) {
                 alert("Zaten oy kullandınız!");
                 return;
             }
 
-            // Kullanıcı sadece bir seçenek seçebilir
-            for (let i = 1; i <= 3; i++) {
-                document.getElementById(`option${i}`).disabled = true; // Tüm butonları devre dışı bırak
-            }
-
+            // Oy ver
             votes[option - 1]++;
             localStorage.setItem('votes', JSON.stringify(votes));
             localStorage.setItem(userKey + '_voted', 'true'); // Kullanıcının oy kullandığını kaydet
+
+            // Sonuçları göster
             displayResults();
         }
 
         function displayResults() {
-            const totalVotes = votes.reduce((a, b) => a + b, 0);
-            document.getElementById('results').style.display = 'block';
-
+            const newTotalVotes = votes.reduce((a, b) => a + b, 0);
             for (let i = 0; i < votes.length; i++) {
-                const percentage = totalVotes ? ((votes[i] / totalVotes) * 100).toFixed(2) : 0;
-                document.getElementById(`result${i + 1}`).innerText = `${i + 1}. ${votes[i] === 1 ? 'Seçenek' : 'Seçenekler'} ${percentage}%`;
+                const percentage = newTotalVotes ? ((votes[i] / newTotalVotes) * 100) : 0;
+                document.getElementById(`bar${i + 1}`).style.width = `${percentage}%`;
             }
         }
 
