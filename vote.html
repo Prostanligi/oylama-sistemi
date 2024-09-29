@@ -16,6 +16,10 @@
             background-color: #e0e0e0;
             border-radius: 5px;
         }
+        #results {
+            display: none;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -33,6 +37,13 @@
         <div class="bar-container">
             <div id="bar3" class="bar" style="width: 0%;"></div>
         </div>
+    </div>
+
+    <div id="results">
+        <h2>Sonuçlar</h2>
+        <p id="result1">1. ADY Makoto: 0 oy (0.00%)</p>
+        <p id="result2">2. MET Lusyon: 0 oy (0.00%)</p>
+        <p id="result3">3. TETA Sezar: 0 oy (0.00%)</p>
     </div>
 
     <script>
@@ -61,7 +72,9 @@
             for (let i = 0; i < votes.length; i++) {
                 const percentage = newTotalVotes ? ((votes[i] / newTotalVotes) * 100) : 0;
                 document.getElementById(`bar${i + 1}`).style.width = `${percentage}%`;
+                document.getElementById(`result${i + 1}`).innerText = `${i + 1}. ${votes[i]} oy (${percentage.toFixed(2)}%)`;
             }
+            document.getElementById('results').style.display = 'block';
         }
 
         window.onload = displayResults;
