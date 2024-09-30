@@ -21,19 +21,63 @@
             margin-top: 20px;
         }
     </style>
+    <script type="module">
+        // Firebase SDK'larını ekleme
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+
+        // Firebase yapılandırma ayarları
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVystHty1ALLeWWAeAJ0bgZo8H4xLVUMw",
+            authDomain: "prostanligioylama.firebaseapp.com",
+            projectId: "prostanligioylama",
+            storageBucket: "prostanligioylama.appspot.com",
+            messagingSenderId: "98986974707",
+            appId: "1:98986974707:web:f12c5054ac11df6b81c686",
+            measurementId: "G-902EF2BKZT"
+        };
+
+        // Firebase'i başlat
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        function vote(option) {
+            const votesRef = ref(database, 'votes/' + option);
+            set(votesRef, (votes) => (votes || 0) + 1);
+            displayResults();
+        }
+
+        function displayResults() {
+            const votesRef = ref(database, 'votes');
+            onValue(votesRef, (snapshot) => {
+                const votes = snapshot.val() || {};
+                const totalVotes = Object.values(votes).reduce((a, b) => a + b, 0);
+                
+                for (let i = 1; i <= 3; i++) {
+                    const voteCount = votes[i] || 0;
+                    const percentage = totalVotes ? (voteCount / totalVotes) * 100 : 0;
+                    document.getElementById(`bar${i}`).style.width = `${percentage}%`;
+                    document.getElementById(`result${i}`).innerText = `${i}. Seçenek: ${voteCount} oy (${percentage.toFixed(2)}%)`;
+                }
+                document.getElementById('results').style.display = 'block';
+            });
+        }
+
+        window.onload = displayResults;
+    </script>
 </head>
 <body>
     <h1>Oylama Seçenekleri</h1>
     <div>
-        <button id="option1" onclick="vote(1)">1. ADY Makoto</button>
+        <button onclick="vote(1)">1. ADY Makoto</button>
         <div class="bar-container">
             <div id="bar1" class="bar" style="width: 0%;"></div>
         </div>
-        <button id="option2" onclick="vote(2)">2. MET Lusyon</button>
+        <button onclick="vote(2)">2. MET Lusyon</button>
         <div class="bar-container">
             <div id="bar2" class="bar" style="width: 0%;"></div>
         </div>
-        <button id="option3" onclick="vote(3)">3. TETA Sezar</button>
+        <button onclick="vote(3)">3. TETA Sezar</button>
         <div class="bar-container">
             <div id="bar3" class="bar" style="width: 0%;"></div>
         </div>
@@ -45,39 +89,5 @@
         <p id="result2">2. MET Lusyon: 0 oy (0.00%)</p>
         <p id="result3">3. TETA Sezar: 0 oy (0.00%)</p>
     </div>
-
-    <script>
-        let votes = JSON.parse(localStorage.getItem('votes')) || [0, 0, 0];
-        const totalVotes = votes.reduce((a, b) => a + b, 0);
-
-        function vote(option) {
-            // Kullanıcının daha önce oy kullanıp kullanmadığını kontrol et
-            const userKey = localStorage.getItem('userName');
-            if (localStorage.getItem(userKey + '_voted')) {
-                alert("Zaten oy kullandınız!");
-                return;
-            }
-
-            // Oy ver
-            votes[option - 1]++;
-            localStorage.setItem('votes', JSON.stringify(votes));
-            localStorage.setItem(userKey + '_voted', 'true'); // Kullanıcının oy kullandığını kaydet
-
-            // Sonuçları göster
-            displayResults();
-        }
-
-        function displayResults() {
-            const newTotalVotes = votes.reduce((a, b) => a + b, 0);
-            for (let i = 0; i < votes.length; i++) {
-                const percentage = newTotalVotes ? ((votes[i] / newTotalVotes) * 100) : 0;
-                document.getElementById(`bar${i + 1}`).style.width = `${percentage}%`;
-                document.getElementById(`result${i + 1}`).innerText = `${i + 1}. ${votes[i]} oy (${percentage.toFixed(2)}%)`;
-            }
-            document.getElementById('results').style.display = 'block';
-        }
-
-        window.onload = displayResults;
-    </script>
 </body>
 </html>
