@@ -48,7 +48,7 @@
             const votesRef = ref(database, 'votes/' + option);
             set(votesRef, (votes) => (votes || 0) + 1);
 
-            // Kullanıcı ismini sakla
+            // Kullanıcı ismini ve seçimini sakla
             const userVotesRef = ref(database, 'users/' + userName);
             set(userVotesRef, { option: option });
 
@@ -71,7 +71,24 @@
             });
         }
 
-        window.onload = displayResults;
+        function displayUsers() {
+            const usersRef = ref(database, 'users');
+            onValue(usersRef, (snapshot) => {
+                const users = snapshot.val() || {};
+                const userList = document.getElementById('user-list');
+                userList.innerHTML = ''; // Listeyi temizle
+                for (const user in users) {
+                    const li = document.createElement('li');
+                    li.innerText = `${user}: ${users[user].option}`;
+                    userList.appendChild(li);
+                }
+            });
+        }
+
+        window.onload = function() {
+            displayResults();
+            displayUsers();
+        };
     </script>
 </head>
 <body>
@@ -101,6 +118,9 @@
         <p id="result2">2. MET Lusyon: 0 oy (0.00%)</p>
         <p id="result3">3. TETA Sezar: 0 oy (0.00%)</p>
     </div>
+
+    <h2>Oy Kullananlar</h2>
+    <ul id="user-list"></ul>
 
     <script>
         function submitUserInfo() {
