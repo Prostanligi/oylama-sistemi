@@ -9,23 +9,24 @@
     <h1>Oylama Sistemi</h1>
     <div id="user-info">
         <input type="text" id="name" placeholder="İsim" required>
-        <input type="text" id="surname" placeholder="Soyisim" required>
+        <input type="email" id="email" placeholder="E-posta" required>
         <button onclick="submitUserInfo()">Devam Et</button>
     </div>
 
     <script>
         function submitUserInfo() {
             const name = document.getElementById('name').value.trim();
-            const surname = document.getElementById('surname').value.trim();
+            const email = document.getElementById('email').value.trim();
 
-            if (name === '' || surname === '') {
-                alert("Lütfen isminizi ve soyisminizi girin.");
+            if (name === '' || email === '') {
+                alert("Lütfen isminizi ve e-posta adresinizi girin.");
                 return;
             }
 
-            const userKey = `${name} ${surname}`;
-            localStorage.setItem('userName', userKey);
+            localStorage.setItem('userName', name);
+            localStorage.setItem('userEmail', email);
 
+            alert("Bilgiler kaydedildi. Oylama sayfasına yönlendiriliyorsunuz...");
             window.location.href = "vote.html"; // Oylama sayfasına yönlendir
         }
     </script>
