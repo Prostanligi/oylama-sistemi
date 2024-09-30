@@ -4,6 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kullanıcı Girişi</title>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+      import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyACb5mbc6bRrSmPlvT3y43XLXSa_oiBxyY",
+        authDomain: "oylama-65f6b.firebaseapp.com",
+        projectId: "oylama-65f6b",
+        storageBucket: "oylama-65f6b.appspot.com",
+        messagingSenderId: "279378344890",
+        appId: "1:279378344890:web:14153b8d9ce6e79d1cfb83"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+
+      function submitUserInfo() {
+          const name = document.getElementById('name').value.trim();
+          const email = document.getElementById('email').value.trim();
+
+          if (name === '' || email === '') {
+              alert("Lütfen isminizi ve e-posta adresinizi girin.");
+              return;
+          }
+
+          const userKey = name + '_' + email; // Benzersiz bir anahtar oluştur
+          set(ref(db, 'users/' + userKey), {
+              name: name,
+              email: email
+          });
+
+          alert("Bilgiler kaydedildi. Oylama sayfasına yönlendiriliyorsunuz...");
+          window.location.href = "vote.html"; // Oylama sayfasına yönlendir
+      }
+    </script>
 </head>
 <body>
     <h1>Oylama Sistemi</h1>
@@ -12,23 +47,5 @@
         <input type="email" id="email" placeholder="E-posta" required>
         <button onclick="submitUserInfo()">Devam Et</button>
     </div>
-
-    <script>
-        function submitUserInfo() {
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-
-            if (name === '' || email === '') {
-                alert("Lütfen isminizi ve e-posta adresinizi girin.");
-                return;
-            }
-
-            localStorage.setItem('userName', name);
-            localStorage.setItem('userEmail', email);
-
-            alert("Bilgiler kaydedildi. Oylama sayfasına yönlendiriliyorsunuz...");
-            window.location.href = "vote.html"; // Oylama sayfasına yönlendir
-        }
-    </script>
 </body>
 </html>
