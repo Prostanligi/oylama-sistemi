@@ -21,83 +21,10 @@
             margin-top: 20px;
         }
     </style>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBVystHty1ALLeWWAeAJ0bgZo8H4xLVUMw",
-            authDomain: "prostanligioylama.firebaseapp.com",
-            projectId: "prostanligioylama",
-            storageBucket: "prostanligioylama.appspot.com",
-            messagingSenderId: "98986974707",
-            appId: "1:98986974707:web:f12c5054ac11df6b81c686",
-            measurementId: "G-902EF2BKZT"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-
-        function vote(option) {
-            const userName = localStorage.getItem('userName');
-            if (!userName) {
-                alert("Lütfen önce adınızı girin.");
-                return;
-            }
-
-            const votesRef = ref(database, 'votes/' + option);
-            set(votesRef, (votes) => (votes || 0) + 1);
-
-            // Kullanıcı ismini ve seçimini sakla
-            const userVotesRef = ref(database, 'users/' + userName);
-            set(userVotesRef, { option: option });
-
-            displayResults();
-        }
-
-        function displayResults() {
-            const votesRef = ref(database, 'votes');
-            onValue(votesRef, (snapshot) => {
-                const votes = snapshot.val() || {};
-                const totalVotes = Object.values(votes).reduce((a, b) => a + b, 0);
-                
-                for (let i = 1; i <= 3; i++) {
-                    const voteCount = votes[i] || 0;
-                    const percentage = totalVotes ? (voteCount / totalVotes) * 100 : 0;
-                    document.getElementById(`bar${i}`).style.width = `${percentage}%`;
-                    document.getElementById(`result${i}`).innerText = `${i}. Seçenek: ${voteCount} oy (${percentage.toFixed(2)}%)`;
-                }
-                document.getElementById('results').style.display = 'block';
-            });
-        }
-
-        function displayUsers() {
-            const usersRef = ref(database, 'users');
-            onValue(usersRef, (snapshot) => {
-                const users = snapshot.val() || {};
-                const userList = document.getElementById('user-list');
-                userList.innerHTML = ''; // Listeyi temizle
-                for (const user in users) {
-                    const li = document.createElement('li');
-                    li.innerText = `${user}: ${users[user].option}`;
-                    userList.appendChild(li);
-                }
-            });
-        }
-
-        window.onload = function() {
-            displayResults();
-            displayUsers();
-        };
-    </script>
 </head>
 <body>
     <h1>Oylama Seçenekleri</h1>
-    <div id="user-info">
-        <input type="text" id="name" placeholder="İsim" required>
-        <button onclick="submitUserInfo()">Devam Et</button>
-    </div>
-    <div id="vote-section" style="display:none;">
+    <div>
         <button onclick="vote(1)">1. ADY Makoto</button>
         <div class="bar-container">
             <div id="bar1" class="bar" style="width: 0%;"></div>
@@ -119,21 +46,39 @@
         <p id="result3">3. TETA Sezar: 0 oy (0.00%)</p>
     </div>
 
-    <h2>Oy Kullananlar</h2>
-    <ul id="user-list"></ul>
-
     <script>
-        function submitUserInfo() {
-            const name = document.getElementById('name').value.trim();
-            if (name === '') {
-                alert("Lütfen isminizi girin.");
+        let votes = JSON.parse(localStorage.getItem('votes')) || [0, 0, 0];
+
+        function vote(option) {
+            const userKey = localStorage.getItem('userName');
+            if (!userKey) {
+                alert("Lütfen önce isminizi girin!");
                 return;
             }
 
-            localStorage.setItem('userName', name);
-            document.getElementById('user-info').style.display = 'none';
-            document.getElementById('vote-section').style.display = 'block';
+            if (localStorage.getItem(userKey + '_voted')) {
+                alert("Zaten oy kullandınız!");
+                return;
+            }
+
+            votes[option - 1]++;
+            localStorage.setItem('votes', JSON.stringify(votes));
+            localStorage.setItem(userKey + '_voted', 'true');
+
+            displayResults();
         }
+
+        function displayResults() {
+            const newTotalVotes = votes.reduce((a, b) => a + b, 0);
+            for (let i = 0; i < votes.length; i++) {
+                const percentage = newTotalVotes ? ((votes[i] / newTotalVotes) * 100) : 0;
+                document.getElementById(`bar${i + 1}`).style.width = `${percentage}%`;
+                document.getElementById(`result${i + 1}`).innerText = `${i + 1}. ${votes[i]} oy (${percentage.toFixed(2)}%)`;
+            }
+            document.getElementById('results').style.display = 'block';
+        }
+
+        window.onload = displayResults; // Sayfa yüklendiğinde sonuçları göster
     </script>
 </body>
 </html>
