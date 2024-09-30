@@ -4,13 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oylama Seçenekleri</title>
-    <style>
-        button {
-            margin: 5px 0;
-            padding: 10px;
-            font-size: 16px;
-        }
-    </style>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+      import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyACb5mbc6bRrSmPlvT3y43XLXSa_oiBxyY",
+        authDomain: "oylama-65f6b.firebaseapp.com",
+        projectId: "oylama-65f6b",
+        storageBucket: "oylama-65f6b.appspot.com",
+        messagingSenderId: "279378344890",
+        appId: "1:279378344890:web:14153b8d9ce6e79d1cfb83"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+
+      let votes = [0, 0, 0];
+
+      function vote(option) {
+          const userKey = localStorage.getItem('userName') + '_' + localStorage.getItem('userEmail');
+          
+          if (!userKey) {
+              alert("Lütfen önce isminizi ve e-posta adresinizi girin!");
+              return;
+          }
+
+          // Oy kaydet
+          votes[option - 1]++;
+          set(ref(db, 'votes/'), {
+              votes: votes
+          });
+
+          alert("Oy kullanıldı! Teşekkür ederiz.");
+      }
+    </script>
 </head>
 <body>
     <h1>Oylama Seçenekleri</h1>
@@ -19,30 +47,5 @@
         <button onclick="vote(2)">2. MET Lusyon</button>
         <button onclick="vote(3)">3. TETA Sezar</button>
     </div>
-
-    <script>
-        let votes = JSON.parse(localStorage.getItem('votes')) || [0, 0, 0];
-
-        function vote(option) {
-            const userKey = localStorage.getItem('userName');
-            if (!userKey) {
-                alert("Lütfen önce isminizi girin!");
-                return;
-            }
-
-            if (localStorage.getItem(userKey + '_voted')) {
-                alert("Zaten oy kullandınız!");
-                return;
-            }
-
-            votes[option - 1]++;
-            localStorage.setItem('votes', JSON.stringify(votes));
-            localStorage.setItem(userKey + '_voted', 'true');
-
-            alert("Oy kullanıldı! Teşekkür ederiz.");
-        }
-
-        // Oylama sonuçlarını gizli tutuyoruz.
-    </script>
 </body>
 </html>
