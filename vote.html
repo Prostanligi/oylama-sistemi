@@ -5,20 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oylama Seçenekleri</title>
     <style>
-        .bar {
-            height: 30px;
-            background-color: lightblue;
+        button {
             margin: 5px 0;
-            transition: width 0.5s;
-        }
-        .bar-container {
-            width: 100%;
-            background-color: #e0e0e0;
-            border-radius: 5px;
-        }
-        #results {
-            display: none;
-            margin-top: 20px;
+            padding: 10px;
+            font-size: 16px;
         }
     </style>
 </head>
@@ -26,24 +16,8 @@
     <h1>Oylama Seçenekleri</h1>
     <div>
         <button onclick="vote(1)">1. ADY Makoto</button>
-        <div class="bar-container">
-            <div id="bar1" class="bar" style="width: 0%;"></div>
-        </div>
         <button onclick="vote(2)">2. MET Lusyon</button>
-        <div class="bar-container">
-            <div id="bar2" class="bar" style="width: 0%;"></div>
-        </div>
         <button onclick="vote(3)">3. TETA Sezar</button>
-        <div class="bar-container">
-            <div id="bar3" class="bar" style="width: 0%;"></div>
-        </div>
-    </div>
-
-    <div id="results">
-        <h2>Sonuçlar</h2>
-        <p id="result1">1. ADY Makoto: 0 oy (0.00%)</p>
-        <p id="result2">2. MET Lusyon: 0 oy (0.00%)</p>
-        <p id="result3">3. TETA Sezar: 0 oy (0.00%)</p>
     </div>
 
     <script>
@@ -65,20 +39,10 @@
             localStorage.setItem('votes', JSON.stringify(votes));
             localStorage.setItem(userKey + '_voted', 'true');
 
-            displayResults();
+            alert("Oy kullanıldı! Teşekkür ederiz.");
         }
 
-        function displayResults() {
-            const newTotalVotes = votes.reduce((a, b) => a + b, 0);
-            for (let i = 0; i < votes.length; i++) {
-                const percentage = newTotalVotes ? ((votes[i] / newTotalVotes) * 100) : 0;
-                document.getElementById(`bar${i + 1}`).style.width = `${percentage}%`;
-                document.getElementById(`result${i + 1}`).innerText = `${i + 1}. ${votes[i]} oy (${percentage.toFixed(2)}%)`;
-            }
-            document.getElementById('results').style.display = 'block';
-        }
-
-        window.onload = displayResults; // Sayfa yüklendiğinde sonuçları göster
+        // Oylama sonuçlarını gizli tutuyoruz.
     </script>
 </body>
 </html>
