@@ -5,47 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oylama Seçenekleri</title>
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-      import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyACb5mbc6bRrSmPlvT3y43XLXSa_oiBxyY",
-        authDomain: "oylama-65f6b.firebaseapp.com",
-        projectId: "oylama-65f6b",
-        storageBucket: "oylama-65f6b.appspot.com",
-        messagingSenderId: "279378344890",
-        appId: "1:279378344890:web:14153b8d9ce6e79d1cfb83"
-      };
+        const firebaseConfig = {
+            apiKey: "AIzaSyACb5mbc6bRrSmPlvT3y43XLXSa_oiBxyY",
+            authDomain: "oylama-65f6b.firebaseapp.com",
+            projectId: "oylama-65f6b",
+            storageBucket: "oylama-65f6b.appspot.com",
+            messagingSenderId: "279378344890",
+            appId: "1:279378344890:web:14153b8d9ce6e79d1cfb83",
+            measurementId: "G-593MN37PKC"
+        };
 
-      const app = initializeApp(firebaseConfig);
-      const db = getDatabase(app);
+        // Firebase'i başlat
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-      let votes = [0, 0, 0];
+        let votes = [0, 0, 0];
 
-      function vote(option) {
-          const userKey = localStorage.getItem('userName') + '_' + localStorage.getItem('userEmail');
-          
-          if (!userKey) {
-              alert("Lütfen önce isminizi ve e-posta adresinizi girin!");
-              return;
-          }
+        function vote(option) {
+            const userKey = localStorage.getItem('userName');
+            if (!userKey) {
+                alert("Oy kullanmak için önce isim ve e-posta girmeniz gerekiyor.");
+                return;
+            }
 
-          // Oy kaydet
-          votes[option - 1]++;
-          set(ref(db, 'votes/'), {
-              votes: votes
-          });
+            votes[option - 1]++;
+            set(ref(db, 'votes/'), {
+                votes: votes
+            }).then(() => {
+                alert("Oyunuz kaydedildi!");
+            }).catch((error) => {
+                console.error("Veritabanına kaydetme hatası: ", error);
+            });
+        }
 
-          alert("Oy kullanıldı! Teşekkür ederiz.");
-      }
+        function displayResults() {
+            get(child(ref(db), 'votes/')).then((snapshot) => {
+                if (snapshot.exists()) {
+                    votes = snapshot.val().votes;
+                    // Sonuçları göster
+                    for (let i = 0; i < votes.length; i++) {
+                        const percentage = ((votes[i] / votes.reduce((a, b) => a + b, 0)) * 100) || 0;
+                        document.getElementById(`result${i + 1}`).innerText = `${i + 1}. Seçenek: ${votes[i]} oy (${percentage.toFixed(2)}%)`;
+                    }
+                } else {
+                    console.log("Veri yok");
+                }
+            }).catch((error) => {
+                console.error("Veri alma hatası: ", error);
+            });
+        }
+
+        window.onload = displayResults;
     </script>
 </head>
 <body>
     <h1>Oylama Seçenekleri</h1>
     <div>
         <button onclick="vote(1)">1. ADY Makoto</button>
+        <p id="result1">1. Seçenek: 0 oy (0.00%)</p>
         <button onclick="vote(2)">2. MET Lusyon</button>
+        <p id="result2">2. Seçenek: 0 oy (0.00%)</p>
         <button onclick="vote(3)">3. TETA Sezar</button>
+        <p id="result3">3. Seçenek: 0 oy (0.00%)</p>
     </div>
 </body>
 </html>
