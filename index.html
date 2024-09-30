@@ -3,28 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oylama Sistemi</title>
+    <title>Oylama Seçenekleri</title>
+    <style>
+        /* Stil ayarları burada */
+    </style>
 </head>
 <body>
-    <h1>Oylama</h1>
+    <h1>Oylama Seçenekleri</h1>
     <div id="user-info">
         <input type="text" id="name" placeholder="İsim" required>
-        <input type="text" id="surname" placeholder="Soyisim" required>
         <button onclick="submitUserInfo()">Devam Et</button>
     </div>
+    
+    <div id="vote-section" style="display:none;">
+        <button onclick="vote(1)">1. ADY Makoto</button>
+        <div class="bar-container">
+            <div id="bar1" class="bar" style="width: 0%;"></div>
+        </div>
+        <button onclick="vote(2)">2. MET Lusyon</button>
+        <div class="bar-container">
+            <div id="bar2" class="bar" style="width: 0%;"></div>
+        </div>
+        <button onclick="vote(3)">3. TETA Sezar</button>
+        <div class="bar-container">
+            <div id="bar3" class="bar" style="width: 0%;"></div>
+        </div>
+    </div>
+
+    <div id="results" style="display:none;">
+        <h2>Sonuçlar</h2>
+        <p id="result1">1. ADY Makoto: 0 oy (0.00%)</p>
+        <p id="result2">2. MET Lusyon: 0 oy (0.00%)</p>
+        <p id="result3">3. TETA Sezar: 0 oy (0.00%)</p>
+    </div>
+
+    <h2>Oy Kullananlar</h2>
+    <ul id="user-list"></ul>
 
     <script>
         function submitUserInfo() {
             const name = document.getElementById('name').value.trim();
-            const surname = document.getElementById('surname').value.trim();
-
-            if (name && surname) {
-                localStorage.setItem('userName', `${name} ${surname}`);
-                window.location.href = "vote.html";
-            } else {
-                alert("Lütfen isminizi ve soyisminizi girin.");
+            if (name === '') {
+                alert("Lütfen isminizi girin.");
+                return;
             }
+
+            localStorage.setItem('userName', name);
+            document.getElementById('user-info').style.display = 'none';
+            document.getElementById('vote-section').style.display = 'block';
         }
+        
+        // Diğer JavaScript fonksiyonları burada
     </script>
 </body>
 </html>
